@@ -3,13 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Free thẻ Garena</title>
 
 <style>
 * {
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
     font-family: Arial, sans-serif;
 }
 
@@ -18,157 +19,252 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(135deg, #111827, #2563eb, #7c3aed);
+
+    background: linear-gradient(
+        135deg,
+        #111827,
+        #2563eb,
+        #7c3aed
+    );
+
     background-size: 300% 300%;
-    animation: bg 8s ease infinite;
-    color: white;
+    animation: backgroundMove 8s infinite ease;
 }
 
-@keyframes bg {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+@keyframes backgroundMove {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
-.container {
+.box {
     width: 90%;
     max-width: 420px;
-}
 
-/* Màn hình chào */
-.welcome {
-    text-align: center;
-    padding: 35px 25px;
+    padding: 30px 25px;
+
     border-radius: 25px;
-    background: rgba(0,0,0,0.35);
+
+    background: rgba(0, 0, 0, 0.4);
+
     backdrop-filter: blur(15px);
-    box-shadow: 0 15px 40px rgba(0,0,0,.35);
+
+    box-shadow:
+        0 20px 50px rgba(0,0,0,.4);
+
+    color: white;
+
+    text-align: center;
 }
 
-.welcome h1 {
-    font-size: 27px;
+
+/* =====================
+   THÔNG BÁO
+===================== */
+
+#welcome h1 {
+    font-size: 28px;
     margin-bottom: 15px;
 }
 
-.welcome p {
+#welcome p {
     color: #ddd;
+    line-height: 1.6;
     margin-bottom: 25px;
-}
-
-button {
-    border: none;
-    cursor: pointer;
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 14px;
-    padding: 14px 20px;
-    transition: .2s;
-}
-
-button:active {
-    transform: scale(.95);
 }
 
 .continue {
     width: 100%;
+
+    padding: 15px;
+
+    border: none;
+    border-radius: 15px;
+
     background: #2563eb;
+
+    color: white;
+
+    font-size: 17px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: .2s;
 }
 
 .continue:hover {
     background: #1d4ed8;
 }
 
-/* Nội dung chính */
-.main {
-    display: none;
-    text-align: center;
-    padding: 35px 25px;
-    border-radius: 25px;
-    background: rgba(0,0,0,0.35);
-    backdrop-filter: blur(15px);
-    box-shadow: 0 15px 40px rgba(0,0,0,.35);
+.continue:active {
+    transform: scale(.95);
 }
 
-.main h1 {
+
+/* =====================
+   TRANG CHÍNH
+===================== */
+
+#main {
+    display: none;
+}
+
+#main h1 {
     font-size: 30px;
     margin-bottom: 10px;
 }
 
-.subtitle {
+.description {
     color: #ddd;
     margin-bottom: 25px;
 }
 
-.cards {
+
+/* =====================
+   NÚT SAO CHÉP
+===================== */
+
+.copy-buttons {
     display: flex;
     flex-direction: column;
+
     gap: 15px;
 }
 
-.claim {
+.copy-btn {
     width: 100%;
-    background: linear-gradient(135deg, #16a34a, #22c55e);
+
+    padding: 16px;
+
+    border: none;
+    border-radius: 15px;
+
+    background: linear-gradient(
+        135deg,
+        #16a34a,
+        #22c55e
+    );
+
+    color: white;
+
+    font-size: 17px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: .2s;
 }
 
-.claim:hover {
+.copy-btn:hover {
+    transform: translateY(-2px);
+
     filter: brightness(1.1);
 }
 
-.received {
+.copy-btn:active {
+    transform: scale(.95);
+}
+
+
+/* Thông báo nhỏ sau khi sao chép */
+
+#toast {
+    position: fixed;
+
+    bottom: 25px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    background: rgba(0,0,0,.85);
+
+    color: white;
+
+    padding: 13px 20px;
+
+    border-radius: 12px;
+
     display: none;
-    padding: 18px;
-    border-radius: 15px;
-    background: rgba(255,255,255,.1);
-    color: #86efac;
-    font-weight: bold;
-    font-size: 17px;
+
+    font-size: 15px;
+
+    z-index: 100;
 }
 </style>
 </head>
 
+
 <body>
 
-<div class="container">
+<div class="box">
 
-    <!-- MÀN HÌNH CHÀO -->
-    <div class="welcome" id="welcome">
+
+    <!-- =====================
+         THÔNG BÁO CHÀO MỪNG
+    ====================== -->
+
+    <div id="welcome">
+
         <h1>👋 Chào mừng bạn!</h1>
 
         <p>
-            Chào mừng bạn đến với web của
-            <b>Văn Kiều đẹp trai</b> 😎
+            Chào mừng bạn đến với
+            <b>web của Văn Kiều đẹp trai</b> 😎
         </p>
 
-        <button class="continue" onclick="enterWeb()">
+        <button
+            class="continue"
+            onclick="enterWeb()">
+
             Tiếp tục 🚀
+
         </button>
+
     </div>
 
 
-    <!-- TRANG CHÍNH -->
-    <div class="main" id="main">
+
+    <!-- =====================
+         TRANG CHÍNH
+    ====================== -->
+
+    <div id="main">
 
         <h1>🎁 Free thẻ Garena</h1>
 
-        <p class="subtitle">
-            Chọn một phần quà bên dưới
+        <p class="description">
+            Bấm nút bên dưới để sao chép
         </p>
 
-        <div class="cards" id="cards">
 
-            <button class="claim" onclick="claimGift(this, '12')">
-                🎫 Sao chép 12
+        <div class="copy-buttons">
+
+            <button
+                class="copy-btn"
+                onclick="copyText('4375639900901138')">
+
+                📋 Sao chép mã
+
             </button>
 
-            <button class="claim" onclick="claimGift(this, '13')">
-                🎫 Sao chép 13
+
+            <button
+                class="copy-btn"
+                onclick="copyText('868991220')">
+
+                📋 Sao chép Seri
+
             </button>
 
-        </div>
-
-        <div class="received" id="received">
-            ✅ Đã có người nhận
         </div>
 
     </div>
@@ -176,41 +272,84 @@ button:active {
 </div>
 
 
+<!-- Thông báo sao chép -->
+
+<div id="toast">
+    ✅ Đã sao chép!
+</div>
+
+
+
 <script>
 
+/* =====================
+   NÚT TIẾP TỤC
+===================== */
+
 function enterWeb() {
+
     document.getElementById("welcome").style.display = "none";
+
     document.getElementById("main").style.display = "block";
+
 }
 
 
-function claimGift(button, number) {
 
-    /*
-       Đây chỉ là ví dụ sao chép số 12 hoặc 13.
-       Bạn có thể thay bằng mã thẻ thật của mình.
-    */
+/* =====================
+   SAO CHÉP
+===================== */
 
-    const text = number;
+function copyText(text) {
 
     navigator.clipboard.writeText(text)
-        .then(() => {
+        .then(function() {
 
-            // Ẩn nút vừa nhận
-            button.style.display = "none";
-
-            // Hiện thông báo
-            document.getElementById("received").style.display = "block";
+            showToast("✅ Đã sao chép " + text + "!");
 
         })
-        .catch(() => {
+        .catch(function() {
 
-            // Nếu trình duyệt không cho sao chép
-            button.style.display = "none";
-            document.getElementById("received").style.display = "block";
+            // Cách sao chép dự phòng
+            const input = document.createElement("textarea");
 
-            alert("Đã nhận!");
+            input.value = text;
+
+            document.body.appendChild(input);
+
+            input.select();
+
+            document.execCommand("copy");
+
+            input.remove();
+
+            showToast("✅ Đã sao chép " + text + "!");
+
         });
+
+}
+
+
+
+/* =====================
+   TOAST
+===================== */
+
+function showToast(message) {
+
+    const toast = document.getElementById("toast");
+
+    toast.innerText = message;
+
+    toast.style.display = "block";
+
+
+    setTimeout(function() {
+
+        toast.style.display = "none";
+
+    }, 1800);
+
 }
 
 </script>
