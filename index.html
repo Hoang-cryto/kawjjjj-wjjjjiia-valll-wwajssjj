@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bypass Link</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#111;color:#eee;font-family:Arial,sans-serif}
+main{max-width:760px;margin:35px auto;padding:20px}
+h1{font-size:32px;margin-bottom:8px}
+p{color:#aaa;line-height:1.5}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:22px 0}
+button{cursor:pointer;padding:15px;border-radius:8px;border:2px solid #444;background:#1d1d1d;color:#55d9ff;font-size:16px;font-weight:600}
+button.active{background:#087f35;color:#fff;border-color:#087f35}
+input{width:100%;padding:16px;background:#181818;border:2px solid #444;border-radius:8px;color:#fff;font-size:16px;margin:10px 0 14px}
+#go{width:100%;background:#087f35;color:#fff;border:0}
+#go:disabled{opacity:.55}
+#status{margin-top:20px;background:#191919;border-radius:8px;padding:18px;line-height:1.65;word-break:break-word}
+a{color:#55d9ff;word-break:break-all}
+.ok{border-left:4px solid #0a3;padding-left:14px}
+.err{border-left:4px solid #d22;padding-left:14px}
+small{color:#777}
+</style>
+</head>
+<body>
+<main>
+<h1>Bypass Link</h1>
+<p>Nhập link rút gọn để thử lấy URL đích thông qua chuyển hướng HTTP công khai.</p>
+
+<div class="grid">
+<button data-domain="link4m.net">Link4m</button>
+<button data-domain="layma.net">Layma.net</button>
+<button data-domain="traffic4k.com">Traffic4k.com</button>
+<button data-domain="site2s.com">Site2s.com</button>
+<button data-domain="bbmkt.com">Bbmkt.com</button>
+<button data-domain="system.traffichub.vn">system.traffichub.vn</button>
+<button data-domain="app.trafficviet.vn">app.trafficviet.vn</button>
+<button data-domain="phienchoso.com">Phienchoso.com</button>
+</div>
+
+<input id="url" type="url" placeholder="Dán link rút gọn...">
+<button id="go">BỎ QUA LINK → TÌM LINK ĐÍCH</button>
+
+<div id="status">Trạng thái: chờ URL...</div>
+<small>Không xử lý CAPTCHA, đăng nhập, cookie riêng tư hoặc token chống bot.</small>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const buttons=[...document.querySelectorAll('[data-domain]')];
+
+buttons.forEach(b=>b.onclick=()=>{
+  buttons.forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+});
+
+function urlOK(s){
+  try{
+    const u=new URL(s);
+    return /^https?:$/.test(u.protocol)?u:null;
+  }catch{return null}
+}
+
+function esc(s){
+  return String(s).replace(/[&<>"']/g,c=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+
+function absolute(v,base){
+  try{return new URL(v,base).href}catch{return null}
+}
+
+function extractTarget(html,base){
+  // Meta refresh
+  let m=html.match(/<meta[^>]+http-equiv\s*=\s*["']?refresh["']?[^>]+content\s*=\s*["'][^"']*url\s*=\s*([^"']+)/i);
+  if(m){let u=absolute(m[1].trim().replace(/^['"]|['"]$/g,''),base);if(u)return u}
+
+  // Canonical
+  m=html.match(/<link[^>]+rel\s*=\s*["']canonical["'][^>]+href\s*=\s*["']([^"']+)/i);
+  if(m){let u=absolute(m[1],base);if(u)return u}
+
+  // Common redirect URL fields in page scripts
+  const patterns=[
+    /(?:location\.href|location\.replace|location)=\s*["'](https?:\/\/[^"']+)/i,
+    /(?:redirect|target|destination|url)\s*[:=]\s*["'](https?:\/\/[^"']+)/i
+  ];
+  for(const p of patterns){
+    m=html.match(p);
+    if(m)return m[1];
+  }
+  return null;
+}
+
+async function resolve(url){
+  // allOrigins fetches the target server-side, avoiding the browser CORS
+  // limitation that caused "Load failed" in the previous version.
+  const api='https://api.allorigins.win/get?url='+encodeURIComponent(url);
+  const r=await fetch(api,{cache:'no-store'});
+  if(!r.ok) throw new Error('Proxy HTTP '+r.status);
+  const data=await r.json();
+
+  // allOrigins normally exposes the upstream response status.
+  if(data.status && data.status.url) return data.status.url;
+
+  const fromHTML=extractTarget(data.contents||'',url);
+  return fromHTML || null;
+}
+
+$('go').onclick=async()=>{
+  const u=urlOK($('url').value.trim());
+  if(!u){
+    $('status').className='err';
+    $('status').textContent='❌ URL không hợp lệ.';
+    return;
+  }
+
+  $('go').disabled=true;
+  $('status').className='';
+  $('status').textContent='⏳ Đang kiểm tra link...';
+
+  try{
+    const target=await resolve(u.href);
+
+    if(target && target!==u.href){
+      $('status').className='ok';
+      $('status').innerHTML='✅ Tìm thấy URL đích:<br><br>'+
+        '<a href="'+esc(target)+'" target="_blank" rel="noopener noreferrer">'+
+        esc(target)+'</a>';
+    }else{
+      $('status').className='err';
+      $('status').innerHTML=
+        '⚠️ Không tìm thấy URL đích công khai.<br>'+
+        'Trang rút gọn có thể yêu cầu JavaScript, CAPTCHA, thời gian chờ hoặc token.';
+    }
+  }catch(e){
+    $('status').className='err';
+    $('status').innerHTML='❌ Không thể xử lý: '+esc(e.message)+
+      '<br><br>Hãy thử mở link gốc trong Safari để kiểm tra nó còn hoạt động không.';
+  }finally{
+    $('go').disabled=false;
+  }
+};
+</script>
+</body>
+</html>
